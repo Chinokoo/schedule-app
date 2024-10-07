@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rosemary_app/components/bottomNavigationBar.dart';
-import 'package:rosemary_app/pages/createTaskPage.dart';
+import 'package:rosemary_app/pages/tasks.dart';
 import 'package:rosemary_app/pages/homepage.dart';
 import 'package:rosemary_app/pages/pomodoro.dart';
 import 'package:rosemary_app/pages/settings.dart';
@@ -18,7 +18,7 @@ class _NavigatePagesState extends State<NavigatePages> {
   //List for the bottom navigation bar items
   final List<Widget> _pages = [
     const Homepage(),
-    const CreateTaskPage(),
+    const AllTaskPage(),
     const PomodoroPage(),
     const SettingsPage(),
   ];

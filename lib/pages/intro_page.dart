@@ -7,12 +7,14 @@ class IntroPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      //the background color of the intro page
       backgroundColor: const Color(0xff85A389),
       body: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // the logo of the app
             const Text(
               "Productivity Plus",
               style: TextStyle(
@@ -20,6 +22,8 @@ class IntroPage extends StatelessWidget {
                   fontSize: 50,
                   fontStyle: FontStyle.italic),
             ),
+
+            // the get started button
             GestureDetector(
               onTap: () => Navigator.push(
                   context,
