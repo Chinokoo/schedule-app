@@ -19,7 +19,7 @@ class _NavigatePagesState extends State<NavigatePages> {
   final List<Widget> _pages = [
     const Homepage(),
     const AllTaskPage(),
-    const PomodoroPage(),
+    PomodoroPage(),
     const SettingsPage(),
   ];
 
