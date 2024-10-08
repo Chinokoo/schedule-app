@@ -203,6 +203,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.0"
+  pomodoro4d:
+    dependency: "direct main"
+    description:
+      name: pomodoro4d
+      sha256: "2c46449ed683aa0498c60fe2f11f995426b278490c428916239278fe947de301"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   provider:
     dependency: transitive
     description:

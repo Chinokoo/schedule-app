@@ -20,7 +20,7 @@ class _DropdownFieldState extends State<DropdownField> {
         border: Border.all(color: Colors.green, width: 2),
       ),
       child: DropdownButtonHideUnderline(
-        child: DropdownButtonFormField<Widget>(
+        child: DropdownButton<Widget>(
           items: widget.taskCategories
               .map((taskCategory) => DropdownMenuItem(
                     value: taskCategory,

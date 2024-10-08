@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:rosemary_app/pages/create_task.dart';
+import 'package:rosemary_app/components/dialog.dart';
+//import 'package:rosemary_app/pages/create_task.dart';
 
 class AllTaskPage extends StatefulWidget {
   const AllTaskPage({super.key});
@@ -9,6 +10,10 @@ class AllTaskPage extends StatefulWidget {
 }
 
 class _AllTaskPageState extends State<AllTaskPage> {
+  void showDialogBox() {
+    showDialog(context: context, builder: (context) => const DialogBox());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,8 +22,9 @@ class _AllTaskPageState extends State<AllTaskPage> {
       ),
       floatingActionButton: FloatingActionButton(
           backgroundColor: const Color(0xff85A389),
-          onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const CreateTask())),
+          onPressed: showDialogBox,
+          //() => Navigator.push(context,
+          //  MaterialPageRoute(builder: (context) => const CreateTask())),
           child: const Icon(
             Icons.add,
             color: Colors.white,
