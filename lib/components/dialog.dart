@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:rosemary_app/components/dropdown-formfield.dart';
+import 'package:rosemary_app/database_operations/productivity_database.dart';
+import 'package:rosemary_app/models/task.dart';
 
 class DialogBox extends StatefulWidget {
   const DialogBox({super.key});
@@ -11,10 +15,21 @@ class DialogBox extends StatefulWidget {
 }
 
 class _DialogBoxState extends State<DialogBox> {
+  //title
+  TextEditingController titleController = TextEditingController();
+  // iscomplete variable to check if task is completed or not.
+  bool iscomplete = false;
+  //loading
+  bool isLoading = false;
   // the value for dropdown menu.
   Widget? value;
   //Storing thevalue of picked date and time
   DateTime? pickedDate;
+  //for converting value to a string.
+  String selectedCategory = "";
+
+  //instance of TaskSchedule class to store the data of the task.
+  TaskSchedule? taskSchedule;
 
   //list of task categories
   final List<Widget> taskCategories = [
@@ -36,10 +51,70 @@ class _DialogBoxState extends State<DialogBox> {
     )
   ];
 
+  // function to get the text from the dropdown menu.
+  String getWidgetText(Widget? widget) {
+    if (widget is Text) {
+      return widget.data ?? '';
+    }
+    return '';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    selectedCategory = getWidgetText(value);
+  }
+
+  void saveTask() {
+    if (titleController.text.isNotEmpty &&
+        selectedCategory.isNotEmpty &&
+        pickedDate != null) {
+      isLoading = true;
+      //instance of Task class to store the data of the task.
+      taskSchedule = TaskSchedule(
+        title: titleController.text,
+        category: selectedCategory,
+        isComplete: iscomplete,
+        dateAndTime: pickedDate!,
+      );
+
+      // Check if taskSchedule is not null before calling createTask
+      if (taskSchedule != null) {
+        //saving to the database
+        context.read<ProductivityDatabase>().createTask(taskSchedule!);
+        //set the loading to false
+        setState(() {
+          isLoading = false;
+        });
+        // showing a toast message to confirm the task creation
+        Fluttertoast.showToast(
+            msg: "Created Succesfully",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        //clearing the text fields
+        Navigator.pop(context);
+      }
+    } else {
+      Fluttertoast.showToast(
+          msg: "fill all the fields!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+  }
+
   // selected date and time.
   void selectDateTime() async {
     DateTime? dateTime = await showOmniDateTimePicker(
       context: context,
+      theme: customTheme,
       initialDate: DateTime.now(),
       firstDate: DateTime(1600).subtract(const Duration(days: 3652)),
       lastDate: DateTime.now().add(
@@ -92,7 +167,7 @@ class _DialogBoxState extends State<DialogBox> {
             color: Colors.green, fontSize: 30, fontWeight: FontWeight.bold),
       )),
       content: SizedBox(
-        height: 200,
+        height: 210,
         child: Column(
           children: [
             // Text Field for task title
@@ -101,18 +176,25 @@ class _DialogBoxState extends State<DialogBox> {
                 decoration: BoxDecoration(
                     border: Border.all(color: Colors.green, width: 2),
                     borderRadius: BorderRadius.circular(8)),
-                child: const TextField(
-                    decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: "Enter Task Title",
-                  hintStyle: TextStyle(color: Colors.lightGreen),
-                ))),
+                child: TextField(
+                    controller: titleController,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      hintText: "Enter Task Title",
+                      hintStyle: TextStyle(color: Colors.lightGreen),
+                    ))),
             // sized box for spacing
             const SizedBox(height: 20),
             // Dropdown for task category
             DropdownField(
               taskCategories: taskCategories,
               value: value,
+              onChanged: (newValue) {
+                setState(() {
+                  value = newValue;
+                  selectedCategory = getWidgetText(value);
+                });
+              },
             ),
 
             // sized box for spacing
@@ -124,21 +206,30 @@ class _DialogBoxState extends State<DialogBox> {
       ),
       actions: [
         //create task button
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: Colors.green,
-          ),
-          child: const Text(
-            "Create",
-            style: TextStyle(color: Colors.white, fontSize: 20),
+        InkWell(
+          onTap: saveTask,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.green,
+            ),
+            child: isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(
+                    color: Colors.green,
+                  ))
+                : const Text(
+                    "Create",
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
           ),
         ),
 
         //the cancel button
         InkWell(
           onTap: () {
+            titleController.clear();
             Navigator.pop(context);
           },
           child: Container(
@@ -176,3 +267,11 @@ class _DialogBoxState extends State<DialogBox> {
         ));
   }
 }
+
+final customTheme = ThemeData(
+  colorScheme: ColorScheme.light(
+    primary: Colors.green,
+    onSurface: Colors.black,
+  ),
+  dialogBackgroundColor: Colors.white,
+);

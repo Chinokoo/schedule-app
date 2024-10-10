@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 
 class DropdownField extends StatefulWidget {
   final List<Widget> taskCategories;
+  final Function(Widget? value) onChanged;
   Widget? value;
-  DropdownField({super.key, required this.taskCategories, this.value});
+  DropdownField(
+      {super.key,
+      required this.taskCategories,
+      this.value,
+      required this.onChanged});
 
   @override
   State<DropdownField> createState() => _DropdownFieldState();
@@ -27,9 +32,7 @@ class _DropdownFieldState extends State<DropdownField> {
                     child: taskCategory,
                   ))
               .toList(),
-          onChanged: ((Widget? newValue) => setState(() {
-                widget.value = newValue;
-              })),
+          onChanged: widget.onChanged,
           hint: const Text(" Select a Task Category"),
           iconSize: 36,
           icon: const Icon(

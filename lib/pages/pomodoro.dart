@@ -73,6 +73,24 @@ class _PomodoroPageState extends State<PomodoroPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
+                // header title
+                const Text(
+                  "Pomodoro Timer",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 40,
+                      fontStyle: FontStyle.italic),
+                ),
+                //sub header title
+                const Text(
+                  "Study for 20 minutes, take a break for 5 minutes, then study again for 20 minutes.",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontStyle: FontStyle.italic),
+                  textAlign: TextAlign.center,
+                ),
                 // the pomodoro timer
                 Text(
                   _formatTime(_seconds),
@@ -99,7 +117,8 @@ class _PomodoroPageState extends State<PomodoroPage> {
                           _isActive
                               ? 'pause'
                               : (isPaused ? 'Continue' : 'Start'),
-                          style: const TextStyle(color: Colors.white),
+                          style: const TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -116,11 +135,23 @@ class _PomodoroPageState extends State<PomodoroPage> {
                           ),
                           child: const Text(
                             'Reset',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
                           )),
                     ),
                   ],
                 ),
+                const SizedBox(
+                  height: 20,
+                ),
+                const Text(
+                  "Avoid Distractions at all cost!",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold),
+                )
               ],
             ),
           ),

@@ -1,6 +1,6 @@
 name: rosemary_app
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 0.1.0
 
 environment:
@@ -15,11 +15,20 @@ dependencies:
   omni_datetime_picker: ^2.0.5
   intl: ^0.19.0
   pomodoro4d: ^0.0.2
+  isar: ^3.1.0+1
+  isar_flutter_libs:
+    git:
+      url: https://github.com/MrLittleWhite/isar_flutter_libs.git
+  path_provider: ^2.1.4
+  provider: ^6.1.2
+  fluttertoast: ^8.2.8
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  isar_generator: ^3.1.0+1
+  build_runner: ^2.4.13
 
 flutter:
   uses-material-design: true

@@ -6,6 +6,7 @@ plugins {
 }
 
 android {
+    namespace 'com.isar.flutter_libs'
     namespace = "com.example.rosemary_app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
