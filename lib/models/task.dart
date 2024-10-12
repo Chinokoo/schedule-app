@@ -9,23 +9,30 @@ class TaskSchedule {
   Id id = Isar.autoIncrement;
 
   // the task title
-  final String title;
+  String title;
 
   //category
-  final String category;
+  String category;
 
   // time and date for the task
-  final DateTime dateAndTime;
+  DateTime dateAndTime;
 
   //completed or not
-  final bool isComplete;
+  bool isComplete;
 
+  //in progress or not.
+  bool isInProgress;
   //completed days
   List<DateTime> completedDays = [];
+  //created at
+  @Index(type: IndexType.value)
+  final DateTime createdAt;
 
   TaskSchedule(
       {required this.title,
       required this.category,
       required this.dateAndTime,
+      required this.createdAt,
+      required this.isInProgress,
       required this.isComplete});
 }

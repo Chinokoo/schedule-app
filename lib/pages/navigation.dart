@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rosemary_app/components/bottomNavigationBar.dart';
+import 'package:rosemary_app/database_operations/productivity_database.dart';
 import 'package:rosemary_app/pages/tasks.dart';
 import 'package:rosemary_app/pages/homepage.dart';
 import 'package:rosemary_app/pages/pomodoro.dart';
@@ -26,6 +28,7 @@ class _NavigatePagesState extends State<NavigatePages> {
   //navigate bottom navigation bar
   void navigateToPage(int index) {
     setState(() {
+      Provider.of<ProductivityDatabase>(context, listen: false).readTask();
       selectedIndex = index;
     });
   }

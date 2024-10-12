@@ -59,10 +59,11 @@ class _DialogBoxState extends State<DialogBox> {
     return '';
   }
 
+  //init state
   @override
   void initState() {
+    Provider.of<ProductivityDatabase>(context, listen: false).readTask();
     super.initState();
-    selectedCategory = getWidgetText(value);
   }
 
   void saveTask() {
@@ -75,17 +76,21 @@ class _DialogBoxState extends State<DialogBox> {
         title: titleController.text,
         category: selectedCategory,
         isComplete: iscomplete,
+        createdAt: DateTime.now(),
+        isInProgress: false,
         dateAndTime: pickedDate!,
       );
 
       // Check if taskSchedule is not null before calling createTask
       if (taskSchedule != null) {
-        //saving to the database
-        context.read<ProductivityDatabase>().createTask(taskSchedule!);
         //set the loading to false
         setState(() {
+          //saving to the database
+          context.read<ProductivityDatabase>().createTask(taskSchedule!);
+
           isLoading = false;
         });
+        Provider.of<ProductivityDatabase>(context, listen: false).readTask();
         // showing a toast message to confirm the task creation
         Fluttertoast.showToast(
             msg: "Created Succesfully",

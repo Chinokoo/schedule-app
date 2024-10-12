@@ -25,24 +25,29 @@ class ProductivityDatabase extends ChangeNotifier {
         title: taskSchedule.title,
         category: taskSchedule.category,
         dateAndTime: taskSchedule.dateAndTime,
+        createdAt: DateTime.now(),
+        isInProgress: false,
         isComplete: taskSchedule.isComplete);
 
     //adding the task to the database
     await isar.writeTxn(() => isar.taskSchedules.put(task));
+    notifyListeners();
   }
 
   // read  a task
   Future<void> readTask() async {
-    // fetch all habits from the db
-    List<TaskSchedule> tasks = await isar.taskSchedules.where().findAll();
+    // fetch all tasks from the db
+    List<TaskSchedule> fetchedTasks =
+        await isar.taskSchedules.where().findAll();
 
-    //give the list of tasks to the List of tasks
-    this.tasks.clear();
-    this.tasks.addAll(tasks);
+    // clear the existing list and add all fetched tasks
+    tasks.clear();
+    tasks.addAll(fetchedTasks);
 
-    //notify the listeners that the list has been updated
+    // sort the tasks by created date in descending order
+    tasks.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    // notify listeners that the list has been updated
     notifyListeners();
   }
-
-  // give the current
 }
