@@ -37,18 +37,23 @@ const TaskScheduleSchema = CollectionSchema(
       name: r'dateAndTime',
       type: IsarType.dateTime,
     ),
-    r'isComplete': PropertySchema(
+    r'description': PropertySchema(
       id: 4,
+      name: r'description',
+      type: IsarType.string,
+    ),
+    r'isComplete': PropertySchema(
+      id: 5,
       name: r'isComplete',
       type: IsarType.bool,
     ),
     r'isInProgress': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'isInProgress',
       type: IsarType.bool,
     ),
     r'title': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'title',
       type: IsarType.string,
     )
@@ -58,7 +63,21 @@ const TaskScheduleSchema = CollectionSchema(
   deserialize: _taskScheduleDeserialize,
   deserializeProp: _taskScheduleDeserializeProp,
   idName: r'id',
-  indexes: {},
+  indexes: {
+    r'createdAt': IndexSchema(
+      id: -3433535483987302584,
+      name: r'createdAt',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'createdAt',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
+    )
+  },
   links: {},
   embeddedSchemas: {},
   getId: _taskScheduleGetId,
@@ -75,6 +94,7 @@ int _taskScheduleEstimateSize(
   var bytesCount = offsets.last;
   bytesCount += 3 + object.category.length * 3;
   bytesCount += 3 + object.completedDays.length * 8;
+  bytesCount += 3 + object.description.length * 3;
   bytesCount += 3 + object.title.length * 3;
   return bytesCount;
 }
@@ -89,9 +109,10 @@ void _taskScheduleSerialize(
   writer.writeDateTimeList(offsets[1], object.completedDays);
   writer.writeDateTime(offsets[2], object.createdAt);
   writer.writeDateTime(offsets[3], object.dateAndTime);
-  writer.writeBool(offsets[4], object.isComplete);
-  writer.writeBool(offsets[5], object.isInProgress);
-  writer.writeString(offsets[6], object.title);
+  writer.writeString(offsets[4], object.description);
+  writer.writeBool(offsets[5], object.isComplete);
+  writer.writeBool(offsets[6], object.isInProgress);
+  writer.writeString(offsets[7], object.title);
 }
 
 TaskSchedule _taskScheduleDeserialize(
@@ -104,9 +125,10 @@ TaskSchedule _taskScheduleDeserialize(
     category: reader.readString(offsets[0]),
     createdAt: reader.readDateTime(offsets[2]),
     dateAndTime: reader.readDateTime(offsets[3]),
-    isComplete: reader.readBool(offsets[4]),
-    isInProgress: reader.readBool(offsets[5]),
-    title: reader.readString(offsets[6]),
+    description: reader.readString(offsets[4]),
+    isComplete: reader.readBool(offsets[5]),
+    isInProgress: reader.readBool(offsets[6]),
+    title: reader.readString(offsets[7]),
   );
   object.completedDays = reader.readDateTimeList(offsets[1]) ?? [];
   object.id = id;
@@ -129,10 +151,12 @@ P _taskScheduleDeserializeProp<P>(
     case 3:
       return (reader.readDateTime(offset)) as P;
     case 4:
-      return (reader.readBool(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 5:
       return (reader.readBool(offset)) as P;
     case 6:
+      return (reader.readBool(offset)) as P;
+    case 7:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -157,6 +181,14 @@ extension TaskScheduleQueryWhereSort
   QueryBuilder<TaskSchedule, TaskSchedule, QAfterWhere> anyId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
+    });
+  }
+
+  QueryBuilder<TaskSchedule, TaskSchedule, QAfterWhere> anyCreatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'createdAt'),
+      );
     });
   }
 }
@@ -225,6 +257,97 @@ extension TaskScheduleQueryWhere
         lower: lowerId,
         includeLower: includeLower,
         upper: upperId,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<TaskSchedule, TaskSchedule, QAfterWhereClause> createdAtEqualTo(
+      DateTime createdAt) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'createdAt',
+        value: [createdAt],
+      ));
+    });
+  }
+
+  QueryBuilder<TaskSchedule, TaskSchedule, QAfterWhereClause>
+      createdAtNotEqualTo(DateTime createdAt) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'createdAt',
+              lower: [],
+              upper: [createdAt],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'createdAt',
+              lower: [createdAt],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'createdAt',
+              lower: [createdAt],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'createdAt',
+              lower: [],
+              upper: [createdAt],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<TaskSchedule, TaskSchedule, QAfterWhereClause>
+      createdAtGreaterThan(
+    DateTime createdAt, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'createdAt',
+        lower: [createdAt],
+        includeLower: include,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<TaskSchedule, TaskSchedule, QAfterWhereClause> createdAtLessThan(
+    DateTime createdAt, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'createdAt',
+        lower: [],
+        upper: [createdAt],
+        includeUpper: include,
+      ));
+    });
+  }
+
+  QueryBuilder<TaskSchedule, TaskSchedule, QAfterWhereClause> createdAtBetween(
+    DateTime lowerCreatedAt,
+    DateTime upperCreatedAt, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'createdAt',
+        lower: [lowerCreatedAt],
+        includeLower: includeLower,
+        upper: [upperCreatedAt],
         includeUpper: includeUpper,
       ));
     });
@@ -626,6 +749,142 @@ extension TaskScheduleQueryFilter
     });
   }
 
+  QueryBuilder<TaskSchedule, TaskSchedule, QAfterFilterCondition>
+      descriptionEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'description',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TaskSchedule, TaskSchedule, QAfterFilterCondition>
+      descriptionGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'description',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TaskSchedule, TaskSchedule, QAfterFilterCondition>
+      descriptionLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'description',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TaskSchedule, TaskSchedule, QAfterFilterCondition>
+      descriptionBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'description',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TaskSchedule, TaskSchedule, QAfterFilterCondition>
+      descriptionStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'description',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TaskSchedule, TaskSchedule, QAfterFilterCondition>
+      descriptionEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'description',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TaskSchedule, TaskSchedule, QAfterFilterCondition>
+      descriptionContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'description',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TaskSchedule, TaskSchedule, QAfterFilterCondition>
+      descriptionMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'description',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<TaskSchedule, TaskSchedule, QAfterFilterCondition>
+      descriptionIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'description',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<TaskSchedule, TaskSchedule, QAfterFilterCondition>
+      descriptionIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'description',
+        value: '',
+      ));
+    });
+  }
+
   QueryBuilder<TaskSchedule, TaskSchedule, QAfterFilterCondition> idEqualTo(
       Id value) {
     return QueryBuilder.apply(this, (query) {
@@ -879,6 +1138,19 @@ extension TaskScheduleQuerySortBy
     });
   }
 
+  QueryBuilder<TaskSchedule, TaskSchedule, QAfterSortBy> sortByDescription() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'description', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TaskSchedule, TaskSchedule, QAfterSortBy>
+      sortByDescriptionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'description', Sort.desc);
+    });
+  }
+
   QueryBuilder<TaskSchedule, TaskSchedule, QAfterSortBy> sortByIsComplete() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isComplete', Sort.asc);
@@ -954,6 +1226,19 @@ extension TaskScheduleQuerySortThenBy
       thenByDateAndTimeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'dateAndTime', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TaskSchedule, TaskSchedule, QAfterSortBy> thenByDescription() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'description', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TaskSchedule, TaskSchedule, QAfterSortBy>
+      thenByDescriptionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'description', Sort.desc);
     });
   }
 
@@ -1036,6 +1321,13 @@ extension TaskScheduleQueryWhereDistinct
     });
   }
 
+  QueryBuilder<TaskSchedule, TaskSchedule, QDistinct> distinctByDescription(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'description', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<TaskSchedule, TaskSchedule, QDistinct> distinctByIsComplete() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'isComplete');
@@ -1086,6 +1378,12 @@ extension TaskScheduleQueryProperty
   QueryBuilder<TaskSchedule, DateTime, QQueryOperations> dateAndTimeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'dateAndTime');
+    });
+  }
+
+  QueryBuilder<TaskSchedule, String, QQueryOperations> descriptionProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'description');
     });
   }
 

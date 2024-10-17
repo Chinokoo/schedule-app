@@ -24,6 +24,7 @@ class ProductivityDatabase extends ChangeNotifier {
     final TaskSchedule task = TaskSchedule(
         title: taskSchedule.title,
         category: taskSchedule.category,
+        description: taskSchedule.description,
         dateAndTime: taskSchedule.dateAndTime,
         createdAt: DateTime.now(),
         isInProgress: false,

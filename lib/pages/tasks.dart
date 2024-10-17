@@ -82,6 +82,7 @@ class _AllTaskPageState extends State<AllTaskPage> {
                             const Divider(
                               color: Color(0xff85A389),
                             ),
+                            Text(task.description),
                             Row(
                               children: [
                                 Container(

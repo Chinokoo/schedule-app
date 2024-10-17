@@ -17,6 +17,9 @@ class TaskSchedule {
   // time and date for the task
   DateTime dateAndTime;
 
+  //task description
+  String description;
+
   //completed or not
   bool isComplete;
 
@@ -32,6 +35,7 @@ class TaskSchedule {
       {required this.title,
       required this.category,
       required this.dateAndTime,
+      required this.description,
       required this.createdAt,
       required this.isInProgress,
       required this.isComplete});

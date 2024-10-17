@@ -17,6 +17,8 @@ class DialogBox extends StatefulWidget {
 class _DialogBoxState extends State<DialogBox> {
   //title
   TextEditingController titleController = TextEditingController();
+  //description
+  TextEditingController descController = TextEditingController();
   // iscomplete variable to check if task is completed or not.
   bool iscomplete = false;
   //loading
@@ -68,6 +70,7 @@ class _DialogBoxState extends State<DialogBox> {
 
   void saveTask() {
     if (titleController.text.isNotEmpty &&
+        descController.text.isNotEmpty &&
         selectedCategory.isNotEmpty &&
         pickedDate != null) {
       isLoading = true;
@@ -75,6 +78,7 @@ class _DialogBoxState extends State<DialogBox> {
       taskSchedule = TaskSchedule(
         title: titleController.text,
         category: selectedCategory,
+        description: descController.text,
         isComplete: iscomplete,
         createdAt: DateTime.now(),
         isInProgress: false,
@@ -171,42 +175,64 @@ class _DialogBoxState extends State<DialogBox> {
         style: TextStyle(
             color: Colors.green, fontSize: 30, fontWeight: FontWeight.bold),
       )),
-      content: SizedBox(
-        height: 210,
-        child: Column(
-          children: [
-            // Text Field for task title
-            Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.green, width: 2),
-                    borderRadius: BorderRadius.circular(8)),
-                child: TextField(
-                    controller: titleController,
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: "Enter Task Title",
-                      hintStyle: TextStyle(color: Colors.lightGreen),
-                    ))),
-            // sized box for spacing
-            const SizedBox(height: 20),
-            // Dropdown for task category
-            DropdownField(
-              taskCategories: taskCategories,
-              value: value,
-              onChanged: (newValue) {
-                setState(() {
-                  value = newValue;
-                  selectedCategory = getWidgetText(value);
-                });
-              },
-            ),
+      content: SingleChildScrollView(
+        child: SizedBox(
+          height: 300,
+          child: Column(
+            children: [
+              // Text Field for task title
+              Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.green, width: 2),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: TextField(
+                      controller: titleController,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        hintText: "Enter Task Title",
+                        hintStyle: TextStyle(color: Colors.lightGreen),
+                      ))),
+              // sized box for spacing
+              const SizedBox(height: 20),
+              // Dropdown for task category
+              DropdownField(
+                taskCategories: taskCategories,
+                value: value,
+                onChanged: (newValue) {
+                  setState(() {
+                    value = newValue;
+                    selectedCategory = getWidgetText(value);
+                  });
+                },
+              ),
+              // sized box for spacing
+              const SizedBox(height: 20),
 
-            // sized box for spacing
-            const SizedBox(height: 20),
-            // pick date and time for task
-            dateTimePicker(),
-          ],
+              // Text Field for task description
+              Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.green, width: 2),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: TextField(
+                      controller: descController,
+                      minLines: 3,
+                      keyboardType: TextInputType.multiline,
+                      maxLines: 4,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        isDense: true,
+                        hintText: "Enter Task Description",
+                        hintStyle: TextStyle(color: Colors.lightGreen),
+                      ))),
+
+              // sized box for spacing
+              const SizedBox(height: 20),
+              // pick date and time for task
+              dateTimePicker(),
+            ],
+          ),
         ),
       ),
       actions: [
