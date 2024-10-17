@@ -81,27 +81,17 @@ class _HomepageState extends State<Homepage> {
                       final task = filteredTasks[index];
                       DateTime time = task.dateAndTime;
                       return ListTile(
-                        leading: SizedBox(
-                          height: 10,
-                          width: 10,
-                          child: Checkbox(
-                              activeColor: Colors.white,
-                              checkColor: const Color(0xff85A389),
-                              side: const BorderSide(
-                                  color: Colors.white, width: 2),
-                              value: task.isComplete,
-                              onChanged: (bool? newValue) {
-                                setState(() {
-                                  task.isComplete = newValue ?? false;
-                                });
-                              }),
-                        ),
+                        leading: Text('${time.hour}:${time.minute}',
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20)),
                         title: Text(
                           task.title,
                           style: const TextStyle(color: Colors.white),
                         ),
                         subtitle: Text(
-                          '${task.category} @ ${time.hour}:${time.minute} on ${time.day}/${time.month}/${time.year}',
+                          'Completed',
                           style: const TextStyle(color: Colors.white),
                         ),
                         trailing: const Icon(
