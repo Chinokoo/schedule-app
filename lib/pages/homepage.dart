@@ -91,12 +91,20 @@ class _HomepageState extends State<Homepage> {
                           style: const TextStyle(color: Colors.white),
                         ),
                         subtitle: Text(
-                          'Completed',
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                        trailing: const Icon(
-                          Icons.more_horiz_rounded,
-                          color: Colors.white,
+                            task.isComplete
+                                ? "Completed"
+                                : (task.isInProgress
+                                    ? "In Progress"
+                                    : (task.dateAndTime.isAfter(DateTime.now())
+                                        ? "Upcoming"
+                                        : "Pending")),
+                            style: const TextStyle(color: Colors.white)),
+                        trailing: Text(
+                          task.category,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20),
                         ),
                       );
                     }),
