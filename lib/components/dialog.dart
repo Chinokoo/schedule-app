@@ -70,7 +70,7 @@ class _DialogBoxState extends State<DialogBox> {
   }
 
   void saveTask() {
-    if (widget.updateTask != null) {
+    if (widget.updateTask == null) {
       if (titleController.text.isNotEmpty &&
           descController.text.isNotEmpty &&
           selectedCategory.isNotEmpty &&
@@ -202,9 +202,9 @@ class _DialogBoxState extends State<DialogBox> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Center(
+      title: Center(
           child: Text(
-        'Create Task',
+        widget.updateTask == null ? 'Create Task' : "Update Task",
         style: TextStyle(
             color: Colors.green, fontSize: 30, fontWeight: FontWeight.bold),
       )),
@@ -283,9 +283,9 @@ class _DialogBoxState extends State<DialogBox> {
                     child: CircularProgressIndicator(
                     color: Colors.green,
                   ))
-                : const Text(
-                    "Create",
-                    style: TextStyle(color: Colors.white, fontSize: 20),
+                : Text(
+                    widget.updateTask == null ? 'Create' : "Update",
+                    style: const TextStyle(color: Colors.white, fontSize: 20),
                   ),
           ),
         ),
@@ -325,7 +325,8 @@ class _DialogBoxState extends State<DialogBox> {
           child: pickedDate != null
               ? Text(
                   'Selected Date: ${DateFormat('MMM d, y HH:mm').format(pickedDate!)}',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
                 )
               : const Text("Pick Date and Time"),
         ));
@@ -333,7 +334,7 @@ class _DialogBoxState extends State<DialogBox> {
 }
 
 final customTheme = ThemeData(
-  colorScheme: ColorScheme.light(
+  colorScheme: const ColorScheme.light(
     primary: Colors.green,
     onSurface: Colors.black,
   ),

@@ -64,45 +64,6 @@ class _AllTaskPageState extends State<AllTaskPage> {
     Provider.of<ProductivityDatabase>(context, listen: false).readTask();
   }
 
-  //alert dialog box for starting the task
-  void showStartDialogBox(TaskSchedule task) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text(
-          "Start this task.",
-          style:
-              TextStyle(color: Color(0xff85A389), fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          Row(
-            children: [
-              ScheduleButton(
-                color: const Color(0xff85A389),
-                text: "Start",
-                onTap: () {
-                  context.read<ProductivityDatabase>().updateTaskProgress(
-                      task.id,
-                      isInProgress: true,
-                      isComplete: false);
-                  Navigator.pop(context);
-                  setState(() {
-                    task.isInProgress = true;
-                  });
-                },
-              ),
-              ScheduleButton(
-                color: Colors.red,
-                text: "Cancel",
-                onTap: () => Navigator.pop(context),
-              )
-            ],
-          )
-        ],
-      ),
-    );
-  }
-
   //updating the task status
   void updateTaskStatus(int taskId, bool isComplete, bool isInProgress) {
     context.read<ProductivityDatabase>().updateTaskProgress(taskId,
@@ -155,7 +116,6 @@ class _AllTaskPageState extends State<AllTaskPage> {
                               editTask: (context) => showEditDialogBox(task),
                               deleteTask: (context) =>
                                   showDeleteDialogBox(task),
-                              onTap: () => showStartDialogBox(task),
                               onStatusChange: (isComplete, isInProgress) {
                                 updateTaskStatus(
                                     task.id, isComplete, isInProgress);

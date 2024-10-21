@@ -6,7 +6,6 @@ import 'package:rosemary_app/components/button.dart';
 class TaskContainer extends StatefulWidget {
   String title, description;
   void Function(BuildContext) editTask, deleteTask;
-  VoidCallback? onTap;
   bool isComplete, isInProgress;
   DateTime date;
   final Function(bool isComplete, bool isInProgress) onStatusChange;
@@ -19,7 +18,6 @@ class TaskContainer extends StatefulWidget {
     required this.description,
     required this.isComplete,
     required this.isInProgress,
-    required this.onTap,
     required this.onStatusChange,
   });
 
@@ -118,40 +116,78 @@ class _TaskContainerState extends State<TaskContainer> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.only(right: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       color: widget.isInProgress
                           ? const Color(0xff85A389)
                           : Colors.transparent),
-                  child: Row(
-                    children: [
-                      Checkbox(
-                          activeColor: const Color(0xff85A389),
-                          shape: const CircleBorder(side: BorderSide()),
-                          value: widget.isInProgress,
-                          onChanged: (bool? newValue) {
-                            widget.isInProgress = newValue ?? false;
-                            //if (widget.isInProgress) {
-                            //widget.isComplete = false;
-                            //}
-                            widget.onStatusChange(
-                                widget.isComplete, widget.isInProgress);
-                          }),
-                      Text(
-                        "In Progress",
-                        style: TextStyle(
-                            color: widget.isInProgress
-                                ? Colors.white
-                                : const Color(0xff85A389)),
-                      ),
-                    ],
+                  child: Text(
+                    "In Progress",
+                    style: TextStyle(
+                      color: widget.isInProgress
+                          ? Colors.white
+                          : const Color(0xff85A389),
+                    ),
                   ),
                 ),
                 ScheduleButton(
-                    color: const Color(0xff85A389),
-                    text: "Start",
-                    onTap: widget.onTap)
+                  color: const Color(0xff85A389),
+                  text: widget.isInProgress ? "Stop" : "Start",
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text(
+                              widget.isInProgress
+                                  ? "Stop Task?"
+                                  : "Start Task?",
+                              style: const TextStyle(
+                                  color: Color(0xff85A389),
+                                  fontWeight: FontWeight.bold)),
+                          content: Text(
+                              widget.isInProgress
+                                  ? "Are you sure you want to stop this task?"
+                                  : "Are you sure you want to start this task?",
+                              style: const TextStyle(
+                                color: Color(0xff85A389),
+                              )),
+                          actions: [
+                            Row(
+                              children: [
+                                ScheduleButton(
+                                  color: Colors.red,
+                                  text: "Cancel",
+                                  onTap: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                ScheduleButton(
+                                  color: const Color(0xff85A389),
+                                  text: widget.isInProgress ? "Stop" : "Start",
+                                  onTap: () {
+                                    setState(() {
+                                      widget.isInProgress =
+                                          !widget.isInProgress;
+                                      if (widget.isInProgress) {
+                                        widget.isComplete = false;
+                                      }
+                                      widget.onStatusChange(widget.isComplete,
+                                          widget.isInProgress);
+                                    });
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            )
+                          ],
+                        );
+                      },
+                    );
+                  },
+                )
               ],
             )
           ],

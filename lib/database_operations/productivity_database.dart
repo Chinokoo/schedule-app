@@ -65,38 +65,34 @@ class ProductivityDatabase extends ChangeNotifier {
   //updating a task
   Future<void> updateTask(int id, TaskSchedule newTaskSchedule) async {
     //find the task with the given id.
-    final task = await isar.taskSchedules.get(id);
-    if (task != null) {
-      //update the task schedule
-      await isar.writeTxn(() async {
-        task.title = newTaskSchedule.title;
-        task.category = newTaskSchedule.category;
-        task.dateAndTime = newTaskSchedule.dateAndTime;
-        await isar.writeTxn(() => isar.taskSchedules.put(task));
-        //re-read from the database.
-        readTask();
-      });
-    }
+    await isar.writeTxn(() async {
+      final existingTask = await isar.taskSchedules.get(id);
+      if (existingTask != null) {
+        existingTask.title = newTaskSchedule.title;
+        existingTask.category = newTaskSchedule.category;
+        existingTask.description = newTaskSchedule.description;
+        existingTask.dateAndTime = newTaskSchedule.dateAndTime;
+
+        await isar.taskSchedules.put(existingTask);
+      }
+    });
+    //re-read the tasks from the database
+    await readTask();
   }
 
   //updating the progress status of a task
   Future<void> updateTaskProgress(int id,
       {required bool isInProgress, required bool isComplete}) async {
-    final index = tasks.indexWhere((task) => task.id == id);
-    if (index != -1) {
-      tasks[index] = tasks[index]
-          .copyWith(isInProgress: isInProgress, isComplete: isComplete);
-
-      await isar.writeTxn(() async {
-        tasks[index].isInProgress = isInProgress;
-        tasks[index].isComplete = isComplete;
-
-        await isar.taskSchedules.put(tasks[index]);
-      });
-      notifyListeners();
-    }
+    await isar.writeTxn(() async {
+      final task = await isar.taskSchedules.get(id);
+      if (task != null) {
+        task.isInProgress = isInProgress;
+        task.isComplete = isComplete;
+        await isar.taskSchedules.put(task);
+      }
+    });
     //re-read from the database
-    readTask();
+    await readTask();
   }
 
   //*deleting a task
@@ -106,6 +102,6 @@ class ProductivityDatabase extends ChangeNotifier {
       await isar.taskSchedules.delete(id);
     });
     //re-read the tasks from the database
-    readTask();
+    await readTask();
   }
 }
