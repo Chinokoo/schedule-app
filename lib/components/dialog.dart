@@ -8,7 +8,8 @@ import 'package:rosemary_app/database_operations/productivity_database.dart';
 import 'package:rosemary_app/models/task.dart';
 
 class DialogBox extends StatefulWidget {
-  const DialogBox({super.key});
+  TaskSchedule? updateTask;
+  DialogBox({super.key, this.updateTask});
 
   @override
   State<DialogBox> createState() => _DialogBoxState();
@@ -69,53 +70,85 @@ class _DialogBoxState extends State<DialogBox> {
   }
 
   void saveTask() {
-    if (titleController.text.isNotEmpty &&
-        descController.text.isNotEmpty &&
-        selectedCategory.isNotEmpty &&
-        pickedDate != null) {
-      isLoading = true;
-      //instance of Task class to store the data of the task.
-      taskSchedule = TaskSchedule(
-        title: titleController.text,
-        category: selectedCategory,
-        description: descController.text,
-        isComplete: iscomplete,
-        createdAt: DateTime.now(),
-        isInProgress: false,
-        dateAndTime: pickedDate!,
-      );
+    if (widget.updateTask != null) {
+      if (titleController.text.isNotEmpty &&
+          descController.text.isNotEmpty &&
+          selectedCategory.isNotEmpty &&
+          pickedDate != null) {
+        isLoading = true;
+        //instance of Task class to store the data of the task.
+        taskSchedule = TaskSchedule(
+          title: titleController.text,
+          category: selectedCategory,
+          description: descController.text,
+          isComplete: iscomplete,
+          createdAt: DateTime.now(),
+          isInProgress: false,
+          dateAndTime: pickedDate!,
+        );
 
-      // Check if taskSchedule is not null before calling createTask
-      if (taskSchedule != null) {
-        //set the loading to false
-        setState(() {
-          //saving to the database
-          context.read<ProductivityDatabase>().createTask(taskSchedule!);
+        // Check if taskSchedule is not null before calling createTask
+        if (taskSchedule != null) {
+          //set the loading to false
+          setState(() {
+            //saving to the database
+            context.read<ProductivityDatabase>().createTask(taskSchedule!);
 
-          isLoading = false;
-        });
-        Provider.of<ProductivityDatabase>(context, listen: false).readTask();
-        // showing a toast message to confirm the task creation
+            isLoading = false;
+          });
+          Provider.of<ProductivityDatabase>(context, listen: false).readTask();
+          // showing a toast message to confirm the task creation
+          Fluttertoast.showToast(
+              msg: "Created Succesfully",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.TOP,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.green,
+              textColor: Colors.white,
+              fontSize: 16.0);
+          //clearing the text fields
+          Navigator.pop(context);
+          setState(() {});
+        }
+      } else {
         Fluttertoast.showToast(
-            msg: "Created Succesfully",
+            msg: "fill all the fields!",
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.TOP,
             timeInSecForIosWeb: 1,
-            backgroundColor: Colors.green,
+            backgroundColor: Colors.red,
             textColor: Colors.white,
             fontSize: 16.0);
-        //clearing the text fields
-        Navigator.pop(context);
+        setState(() {});
       }
     } else {
+      //for updating the task...
+      TaskSchedule updatedTask = TaskSchedule(
+          title: titleController.text,
+          category: selectedCategory,
+          dateAndTime: pickedDate!,
+          description: descController.text,
+          createdAt: widget.updateTask!.createdAt,
+          isInProgress: widget.updateTask!.isInProgress,
+          isComplete: widget.updateTask!.isComplete);
+
+      //updating to the database
+      context
+          .read<ProductivityDatabase>()
+          .updateTask(widget.updateTask!.id, updatedTask);
+
+      // showing a toast message to confirm the task update
       Fluttertoast.showToast(
-          msg: "fill all the fields!",
+          msg: "Updated Succesfully",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
+          backgroundColor: Colors.green,
           textColor: Colors.white,
           fontSize: 16.0);
+      //clearing the text fields
+      Navigator.pop(context);
+      setState(() {});
     }
   }
 
@@ -177,7 +210,7 @@ class _DialogBoxState extends State<DialogBox> {
       )),
       content: SingleChildScrollView(
         child: SizedBox(
-          height: 300,
+          height: 350,
           child: Column(
             children: [
               // Text Field for task title

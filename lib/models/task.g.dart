@@ -22,38 +22,33 @@ const TaskScheduleSchema = CollectionSchema(
       name: r'category',
       type: IsarType.string,
     ),
-    r'completedDays': PropertySchema(
-      id: 1,
-      name: r'completedDays',
-      type: IsarType.dateTimeList,
-    ),
     r'createdAt': PropertySchema(
-      id: 2,
+      id: 1,
       name: r'createdAt',
       type: IsarType.dateTime,
     ),
     r'dateAndTime': PropertySchema(
-      id: 3,
+      id: 2,
       name: r'dateAndTime',
       type: IsarType.dateTime,
     ),
     r'description': PropertySchema(
-      id: 4,
+      id: 3,
       name: r'description',
       type: IsarType.string,
     ),
     r'isComplete': PropertySchema(
-      id: 5,
+      id: 4,
       name: r'isComplete',
       type: IsarType.bool,
     ),
     r'isInProgress': PropertySchema(
-      id: 6,
+      id: 5,
       name: r'isInProgress',
       type: IsarType.bool,
     ),
     r'title': PropertySchema(
-      id: 7,
+      id: 6,
       name: r'title',
       type: IsarType.string,
     )
@@ -93,7 +88,6 @@ int _taskScheduleEstimateSize(
 ) {
   var bytesCount = offsets.last;
   bytesCount += 3 + object.category.length * 3;
-  bytesCount += 3 + object.completedDays.length * 8;
   bytesCount += 3 + object.description.length * 3;
   bytesCount += 3 + object.title.length * 3;
   return bytesCount;
@@ -106,13 +100,12 @@ void _taskScheduleSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeString(offsets[0], object.category);
-  writer.writeDateTimeList(offsets[1], object.completedDays);
-  writer.writeDateTime(offsets[2], object.createdAt);
-  writer.writeDateTime(offsets[3], object.dateAndTime);
-  writer.writeString(offsets[4], object.description);
-  writer.writeBool(offsets[5], object.isComplete);
-  writer.writeBool(offsets[6], object.isInProgress);
-  writer.writeString(offsets[7], object.title);
+  writer.writeDateTime(offsets[1], object.createdAt);
+  writer.writeDateTime(offsets[2], object.dateAndTime);
+  writer.writeString(offsets[3], object.description);
+  writer.writeBool(offsets[4], object.isComplete);
+  writer.writeBool(offsets[5], object.isInProgress);
+  writer.writeString(offsets[6], object.title);
 }
 
 TaskSchedule _taskScheduleDeserialize(
@@ -123,14 +116,13 @@ TaskSchedule _taskScheduleDeserialize(
 ) {
   final object = TaskSchedule(
     category: reader.readString(offsets[0]),
-    createdAt: reader.readDateTime(offsets[2]),
-    dateAndTime: reader.readDateTime(offsets[3]),
-    description: reader.readString(offsets[4]),
-    isComplete: reader.readBool(offsets[5]),
-    isInProgress: reader.readBool(offsets[6]),
-    title: reader.readString(offsets[7]),
+    createdAt: reader.readDateTime(offsets[1]),
+    dateAndTime: reader.readDateTime(offsets[2]),
+    description: reader.readString(offsets[3]),
+    isComplete: reader.readBool(offsets[4]),
+    isInProgress: reader.readBool(offsets[5]),
+    title: reader.readString(offsets[6]),
   );
-  object.completedDays = reader.readDateTimeList(offsets[1]) ?? [];
   object.id = id;
   return object;
 }
@@ -145,18 +137,16 @@ P _taskScheduleDeserializeProp<P>(
     case 0:
       return (reader.readString(offset)) as P;
     case 1:
-      return (reader.readDateTimeList(offset) ?? []) as P;
+      return (reader.readDateTime(offset)) as P;
     case 2:
       return (reader.readDateTime(offset)) as P;
     case 3:
-      return (reader.readDateTime(offset)) as P;
-    case 4:
       return (reader.readString(offset)) as P;
+    case 4:
+      return (reader.readBool(offset)) as P;
     case 5:
       return (reader.readBool(offset)) as P;
     case 6:
-      return (reader.readBool(offset)) as P;
-    case 7:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -489,151 +479,6 @@ extension TaskScheduleQueryFilter
         property: r'category',
         value: '',
       ));
-    });
-  }
-
-  QueryBuilder<TaskSchedule, TaskSchedule, QAfterFilterCondition>
-      completedDaysElementEqualTo(DateTime value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'completedDays',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<TaskSchedule, TaskSchedule, QAfterFilterCondition>
-      completedDaysElementGreaterThan(
-    DateTime value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'completedDays',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<TaskSchedule, TaskSchedule, QAfterFilterCondition>
-      completedDaysElementLessThan(
-    DateTime value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'completedDays',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<TaskSchedule, TaskSchedule, QAfterFilterCondition>
-      completedDaysElementBetween(
-    DateTime lower,
-    DateTime upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'completedDays',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
-    });
-  }
-
-  QueryBuilder<TaskSchedule, TaskSchedule, QAfterFilterCondition>
-      completedDaysLengthEqualTo(int length) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'completedDays',
-        length,
-        true,
-        length,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<TaskSchedule, TaskSchedule, QAfterFilterCondition>
-      completedDaysIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'completedDays',
-        0,
-        true,
-        0,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<TaskSchedule, TaskSchedule, QAfterFilterCondition>
-      completedDaysIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'completedDays',
-        0,
-        false,
-        999999,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<TaskSchedule, TaskSchedule, QAfterFilterCondition>
-      completedDaysLengthLessThan(
-    int length, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'completedDays',
-        0,
-        true,
-        length,
-        include,
-      );
-    });
-  }
-
-  QueryBuilder<TaskSchedule, TaskSchedule, QAfterFilterCondition>
-      completedDaysLengthGreaterThan(
-    int length, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'completedDays',
-        length,
-        include,
-        999999,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<TaskSchedule, TaskSchedule, QAfterFilterCondition>
-      completedDaysLengthBetween(
-    int lower,
-    int upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'completedDays',
-        lower,
-        includeLower,
-        upper,
-        includeUpper,
-      );
     });
   }
 
@@ -1302,13 +1147,6 @@ extension TaskScheduleQueryWhereDistinct
     });
   }
 
-  QueryBuilder<TaskSchedule, TaskSchedule, QDistinct>
-      distinctByCompletedDays() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'completedDays');
-    });
-  }
-
   QueryBuilder<TaskSchedule, TaskSchedule, QDistinct> distinctByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'createdAt');
@@ -1359,13 +1197,6 @@ extension TaskScheduleQueryProperty
   QueryBuilder<TaskSchedule, String, QQueryOperations> categoryProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'category');
-    });
-  }
-
-  QueryBuilder<TaskSchedule, List<DateTime>, QQueryOperations>
-      completedDaysProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'completedDays');
     });
   }
 

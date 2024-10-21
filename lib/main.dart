@@ -22,6 +22,7 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<ProductivityDatabase>();
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: IntroPage(),

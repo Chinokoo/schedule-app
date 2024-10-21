@@ -15,10 +15,10 @@ class ProductivityDatabase extends ChangeNotifier {
     );
   }
 
-  // list of Tasks
+  //* list of Tasks
   final List<TaskSchedule> tasks = [];
 
-  // creating the first task
+  //* creating the first task
   Future<void> createTask(TaskSchedule taskSchedule) async {
     // creating a new task
     final TaskSchedule task = TaskSchedule(
@@ -35,7 +35,7 @@ class ProductivityDatabase extends ChangeNotifier {
     notifyListeners();
   }
 
-  // read  a task
+  //* read  a task
   Future<void> readTask() async {
     // fetch all tasks from the db
     List<TaskSchedule> fetchedTasks =
@@ -50,5 +50,62 @@ class ProductivityDatabase extends ChangeNotifier {
 
     // notify listeners that the list has been updated
     notifyListeners();
+  }
+
+  // read a completed task
+  Future<List<TaskSchedule>> completedTask(
+      bool isComplete, DateTime date) async {
+    //fetch all habits from the database
+    List<TaskSchedule> completedTasks =
+        await isar.taskSchedules.filter().isCompleteEqualTo(true).findAll();
+
+    return completedTasks;
+  }
+
+  //updating a task
+  Future<void> updateTask(int id, TaskSchedule newTaskSchedule) async {
+    //find the task with the given id.
+    final task = await isar.taskSchedules.get(id);
+    if (task != null) {
+      //update the task schedule
+      await isar.writeTxn(() async {
+        task.title = newTaskSchedule.title;
+        task.category = newTaskSchedule.category;
+        task.dateAndTime = newTaskSchedule.dateAndTime;
+        await isar.writeTxn(() => isar.taskSchedules.put(task));
+        //re-read from the database.
+        readTask();
+      });
+    }
+  }
+
+  //updating the progress status of a task
+  Future<void> updateTaskProgress(int id,
+      {required bool isInProgress, required bool isComplete}) async {
+    final index = tasks.indexWhere((task) => task.id == id);
+    if (index != -1) {
+      tasks[index] = tasks[index]
+          .copyWith(isInProgress: isInProgress, isComplete: isComplete);
+
+      await isar.writeTxn(() async {
+        tasks[index].isInProgress = isInProgress;
+        tasks[index].isComplete = isComplete;
+
+        await isar.taskSchedules.put(tasks[index]);
+      });
+      notifyListeners();
+    }
+    //re-read from the database
+    readTask();
+  }
+
+  //*deleting a task
+  Future<void> deleteTask(int id) async {
+    //perform the delete operation
+    await isar.writeTxn(() async {
+      await isar.taskSchedules.delete(id);
+    });
+    //re-read the tasks from the database
+    readTask();
   }
 }
