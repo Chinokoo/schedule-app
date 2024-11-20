@@ -228,9 +228,25 @@ class _AddScheduleFormState extends State<AddScheduleForm> {
           TextButton(
             onPressed: () async {
               final TimeOfDay? pickedTime = await showTimePicker(
-                context: context,
-                initialTime: TimeOfDay.fromDateTime(_selectedTime),
-              );
+                  context: context,
+                  initialTime: TimeOfDay.fromDateTime(_selectedTime),
+                  builder: (context, child) {
+                    return Theme(
+                      data: Theme.of(context).copyWith(
+                        timePickerTheme: const TimePickerThemeData(
+                          backgroundColor: Colors.white,
+                          dialBackgroundColor: Colors.white,
+                          dialHandColor: Colors.green,
+                          dialTextColor: Colors.black,
+                          hourMinuteTextColor: Colors.white,
+                          hourMinuteColor: Colors.green,
+                          dayPeriodTextColor: Colors.white,
+                          dayPeriodColor: Colors.green,
+                        ),
+                      ),
+                      child: child!,
+                    );
+                  });
               if (pickedTime != null) {
                 setState(() {
                   _selectedTime = DateTime(
@@ -244,7 +260,9 @@ class _AddScheduleFormState extends State<AddScheduleForm> {
               }
             },
             child: Text(
-                'Select Time: ${_selectedTime.hour}:${_selectedTime.minute}'),
+              'Select Time: ${_selectedTime.hour}:${_selectedTime.minute}',
+              style: const TextStyle(color: Colors.green),
+            ),
           ),
 
           //create task button
