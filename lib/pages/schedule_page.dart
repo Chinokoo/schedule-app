@@ -6,6 +6,7 @@ import 'package:rosemary_app/components/button.dart';
 import 'package:rosemary_app/components/schedule_card.dart';
 import 'package:rosemary_app/database_operations/productivity_database.dart';
 import 'package:rosemary_app/models/schedule.dart';
+import 'package:rosemary_app/notifications/notification.dart';
 
 class SchedulePage extends StatefulWidget {
   const SchedulePage({Key? key}) : super(key: key);
@@ -102,7 +103,7 @@ class _SchedulePageState extends State<SchedulePage> {
                   });
                 }),
             schedules.isEmpty
-                ? Center(
+                ? const Center(
                     child: Text("No Schedules."),
                   )
                 : Expanded(
@@ -148,8 +149,16 @@ class _SchedulePageState extends State<SchedulePage> {
         content: AddScheduleForm(
           onSubmit: (ScheduleItem item) {
             productivityDatabase.createSchedule(item);
-            readSchedules();
             Navigator.pop(context);
+
+            Provider.of<ProductivityDatabase>(context, listen: false)
+                .readSchedule();
+            NotificationService.showInstantNotification(
+                "Schedule Created", "${item.description} has been created");
+            NotificationService.showScheduledNotification(
+                "Scheduled Notification",
+                "${item.title} has been scheduled to start at ${item.dateTime}",
+                item.dateTime);
           },
         ),
       ),
@@ -277,6 +286,7 @@ class _AddScheduleFormState extends State<AddScheduleForm> {
                   dateTime: _selectedTime,
                   daysOfWeek: _selectedDays,
                 ));
+
                 // showing a toast message to confirm the task creation
                 Fluttertoast.showToast(
                     msg: "Created Succesfully",

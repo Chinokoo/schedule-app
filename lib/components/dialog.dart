@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:rosemary_app/components/dropdown-formfield.dart';
 import 'package:rosemary_app/database_operations/productivity_database.dart';
 import 'package:rosemary_app/models/task.dart';
+import 'package:rosemary_app/notifications/notification.dart';
 
 class DialogBox extends StatefulWidget {
   TaskSchedule? updateTask;
@@ -105,6 +106,9 @@ class _DialogBoxState extends State<DialogBox> {
           Navigator.pop(context);
 
           Provider.of<ProductivityDatabase>(context, listen: false).readTask();
+
+          NotificationService.showInstantNotification(
+              "Schedule Created", "${titleController.text} has been created");
 
           // showing a toast message to confirm the task creation
           Fluttertoast.showToast(

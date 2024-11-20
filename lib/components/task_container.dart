@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:rosemary_app/components/button.dart';
+import 'package:rosemary_app/notifications/notification.dart';
 
 class TaskContainer extends StatefulWidget {
   String title, description;
@@ -177,6 +178,9 @@ class _TaskContainerState extends State<TaskContainer> {
                                       widget.onStatusChange(widget.isComplete,
                                           widget.isInProgress);
                                     });
+                                    NotificationService.showInstantNotification(
+                                        "Task has Started",
+                                        "This Task has Started");
                                     Navigator.of(context).pop();
                                   },
                                 ),
