@@ -65,8 +65,14 @@ class _DialogBoxState extends State<DialogBox> {
   //init state
   @override
   void initState() {
-    Provider.of<ProductivityDatabase>(context, listen: false).readTask();
+    readTasks();
     super.initState();
+  }
+
+  //read and display all notes
+  void readTasks() {
+    //read all tasks from the database
+    Provider.of<ProductivityDatabase>(context, listen: false).readTask();
   }
 
   void saveTask() {
@@ -96,7 +102,10 @@ class _DialogBoxState extends State<DialogBox> {
 
             isLoading = false;
           });
+          Navigator.pop(context);
+
           Provider.of<ProductivityDatabase>(context, listen: false).readTask();
+
           // showing a toast message to confirm the task creation
           Fluttertoast.showToast(
               msg: "Created Succesfully",
@@ -107,8 +116,6 @@ class _DialogBoxState extends State<DialogBox> {
               textColor: Colors.white,
               fontSize: 16.0);
           //clearing the text fields
-          Navigator.pop(context);
-          setState(() {});
         }
       } else {
         Fluttertoast.showToast(
